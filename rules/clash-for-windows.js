@@ -119,7 +119,7 @@ const ruleProviders = {
   Lan: {
     type: 'http',
     behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/ericz15/ios_rule_script/refs/heads/master/rule/Clash/Lan/Lan_No_Resolve.yaml',
+    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml',
     format: 'yaml',
     path: './ruleset/Lan.yaml',
     interval: 86400
