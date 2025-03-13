@@ -192,6 +192,7 @@ const dns = {
   // 当 GEOIP 国家不是 `CN` 时, 将使用 fallback 服务器的响应
   fallback: [
     '80.80.81.81',
+    'https://223.5.5.5/dns-query',
     'https://dns.twnic.tw/dns-query', // 台湾101
     'https://1.0.0.1/dns-query', // Cloudflare
     'https://1.1.1.1/dns-query', // Cloudflare
