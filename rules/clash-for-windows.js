@@ -1,15 +1,15 @@
 const areaSchema = {
-  '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/ },
-  '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/ },
-  '🇯🇵 日本节点': { reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/ },
-  '🇸🇬 新加坡节点': { reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/ },
-  '🇰🇷 韩国节点': { reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/ },
-  '🇺🇲 美国节点': { reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/ },
-  '🏳️‍🌈 其他地区': { reg: /^(?!.*游戏).*/ }
+  '🇭🇰 香港节点': {reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/},
+  '🇨🇳 台湾节点': {reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/},
+  '🇯🇵 日本节点': {reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/},
+  '🇸🇬 新加坡节点': {reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/},
+  '🇰🇷 韩国节点': {reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/},
+  '🇺🇲 美国节点': {reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/},
+  '🏳️‍🌈 其他地区': {reg: /^(?!.*游戏).*/}
 }
 const customSchema = {
-  '⬇️ 低倍节点': { reg: /(?<![0-9])0\.[0-9]+|低倍/ },
-  '💬 人工智能': { reg: /^(?!.*游戏).*(ai|gpt)+(.*)/i }
+  '⬇️ 低倍节点': {reg: /(?<![0-9])0\.[0-9]+|低倍/},
+  '💬 人工智能': {reg: /^(?!.*游戏).*(ai|gpt)+(.*)/i}
 }
 
 const ruleProviders = {
@@ -119,7 +119,7 @@ const ruleProviders = {
   Lan: {
     type: 'http',
     behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml',
+    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan_Resolve.yaml',
     format: 'yaml',
     path: './ruleset/Lan.yaml',
     interval: 86400
@@ -152,39 +152,72 @@ const rules = [
 
 const dns = {
   enable: true,
+  listen: '0.0.0.0:53',
   ipv6: false,
+
+  // 查找 hosts 并返回 IP 记录
   'use-hosts': true,
+
   'enhanced-mode': 'fake-ip',
+  // Fake IP 地址池 CIDR
   'fake-ip-range': '198.18.0.1/16',
+  // 此列表中的主机名将不会使用 Fake IP 解析。
+  // 即, 对这些域名的请求将始终使用其真实 IP 地址进行响应
+  'fake-ip-filter': [
+    '*.lan',
+    '*.local',
+    'localhost.ptlogin2.qq.com',
+    '*.snapdrop.net'
+  ],
+
+  // 这些 名称服务器(nameservers) 用于解析下列 DNS 名称服务器主机名.
+  // 仅指定 IP 地址
   'default-nameserver': [
     '119.29.29.29',
-    '1.0.0.1',
-    '223.5.5.5'
+    '223.5.5.5',
+    '1.0.0.1'
   ],
+  // 支持 UDP、TCP、DoT、DoH. 您可以指定要连接的端口.
+  // 所有 DNS 查询都直接发送到名称服务器, 无需代理
+  // Clash 使用第一个收到的响应作为 DNS 查询的结果.
   nameserver: [
-    'https://doh.pub/dns-query',
-    'https://dns.alidns.com/dns-query',
-    'https://101.6.6.6:8443/dns-query',
-    'tls://1.12.12.12'
+    '119.29.29.29', // 腾讯
+    '223.5.5.5', // 阿里
+    'https://1.12.12.12/dns-query', // 腾讯
+    'https://223.5.5.5/dns-query', // 阿里
+    'tls://1.12.12.12:853', // 腾讯
+    'tls://dns.alidns.com:853', // 阿里
   ],
+  // 当 `fallback` 存在时, DNS 服务器将向此部分中的服务器 与 `nameservers` 中的服务器发送并发请求
+  // 当 GEOIP 国家不是 `CN` 时, 将使用 fallback 服务器的响应
   fallback: [
-    'https://1.0.0.1/dns-query',
-    'https://1.1.1.1/dns-query',
-    'tls://1.0.0.1:853',
-    'tls://8.8.4.4:853',
-    'https://dns.quad9.net/dns-query'
+    '80.80.81.81',
+    'https://dns.twnic.tw/dns-query', // 台湾101
+    'https://1.0.0.1/dns-query', // Cloudflare
+    'https://1.1.1.1/dns-query', // Cloudflare
+    'https://doh.dns.sb/dns-query', // DNS.SB
+    'https://dns.adguard.com/dns-query', // AdGuard
+    'https://dns.quad9.net/dns-query', // IBM Quad9
+    'tls://one.one.one.one:853', // Cloudflare
   ],
+  // 如果使用 `nameservers` 解析的 IP 地址在下面指定的子网中,则认为它们无效, 并使用 `fallback` 服务器的结果.
+  // 当 `fallback-filter.geoip` 为 true 且 IP 地址的 GEOIP 为 `CN` 时,将使用 `nameservers` 服务器解析的 IP 地址.
+  // 如果 `fallback-filter.geoip` 为 false, 且不匹配 `fallback-filter.ipcidr`,则始终使用 `nameservers` 服务器的结果
+  // 这是对抗 DNS 污染攻击的一种措施.
   'fallback-filter': {
     geoip: true,
     'geoip-code': 'CN',
-    ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
+    ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
+    domain: [
+      '+.google.com'
+    ]
   }
 }
 
 function schemaParse(
   proxies,
   scheme,
-  options = { skip: true, target: 'array' }
+  options = {skip: true, target: 'array'}
 ) {
   let proxyGroups = Object.entries(scheme).map(([name, item]) => {
     return {
@@ -222,11 +255,11 @@ function schemaParse(
 
 async function main(
   raw,
-  { axios, yaml, notify, console },
-  { name, url, interval, selected }
+  {axios, yaml, notify, console},
+  {name, url, interval, selected}
 ) {
   const params = yaml.parse(raw)
-  const { proxies } = params
+  const {proxies} = params
 
   const areaProxyGroup = schemaParse(proxies, areaSchema)
   const customProxyGroup = schemaParse(proxies, customSchema, {
