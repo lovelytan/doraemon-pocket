@@ -194,8 +194,8 @@ const dns = {
     '80.80.81.81',
     'https://223.5.5.5/dns-query',
     'https://dns.twnic.tw/dns-query', // 台湾101
-    'https://1.0.0.1/dns-query', // Cloudflare
-    'https://1.1.1.1/dns-query', // Cloudflare
+    // 'https://1.0.0.1/dns-query', // Cloudflare
+    // 'https://1.1.1.1/dns-query', // Cloudflare
     'https://doh.dns.sb/dns-query', // DNS.SB
     'https://dns.adguard.com/dns-query', // AdGuard
     'https://dns.quad9.net/dns-query', // IBM Quad9
