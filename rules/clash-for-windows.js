@@ -191,11 +191,11 @@ const dns = {
   // 当 `fallback` 存在时, DNS 服务器将向此部分中的服务器 与 `nameservers` 中的服务器发送并发请求
   // 当 GEOIP 国家不是 `CN` 时, 将使用 fallback 服务器的响应
   fallback: [
+    '1.0.0.1',
+    '8.8.4.4',
     '80.80.81.81',
-    'https://223.5.5.5/dns-query',
+    'https://223.5.5.5/dns-query', // 阿里
     'https://dns.twnic.tw/dns-query', // 台湾101
-    // 'https://1.0.0.1/dns-query', // Cloudflare
-    // 'https://1.1.1.1/dns-query', // Cloudflare
     'https://doh.dns.sb/dns-query', // DNS.SB
     'https://dns.adguard.com/dns-query', // AdGuard
     'https://dns.quad9.net/dns-query', // IBM Quad9
