@@ -194,9 +194,8 @@ const dns = {
     '1.0.0.1',
     '8.8.4.4',
     '80.80.81.81',
-    'https://223.5.5.5/dns-query', // 阿里
-    'https://dns.twnic.tw/dns-query', // 台湾101
     'https://doh.dns.sb/dns-query', // DNS.SB
+    'https://dns.twnic.tw/dns-query', // 台湾101
     'https://dns.adguard.com/dns-query', // AdGuard
     'https://dns.quad9.net/dns-query', // IBM Quad9
     'tls://one.one.one.one:853', // Cloudflare
