@@ -145,7 +145,7 @@ const rules = [
   'RULE-SET,Telegram,🚀 节点选择',
   'RULE-SET,GFW,🚀 节点选择',
   'RULE-SET,China,DIRECT',
-  'RULE-SET,Lan,DIRECT',
+  'RULE-SET,Lan,DIRECT,no-resolve',
   'GEOIP,CN,DIRECT,no-resolve',
   'MATCH,🐟 漏网之鱼'
 ]
