@@ -1,3 +1,141 @@
+// 国内DNS服务器
+const domesticNameservers = [
+  '119.29.29.29', // 腾讯
+  '223.5.5.5', // 阿里
+  'https://1.12.12.12/dns-query', // 腾讯
+  'https://223.5.5.5/dns-query', // 阿里
+  'tls://1.12.12.12:853', // 腾讯
+  'tls://dns.alidns.com:853' // 阿里
+]
+// 国外DNS服务器
+const foreignNameservers = [
+  '1.0.0.1',
+  '8.8.4.4',
+  '80.80.81.81',
+  'https://doh.dns.sb/dns-query', // DNS.SB
+  'https://dns.twnic.tw/dns-query', // 台湾101
+  'https://dns.adguard.com/dns-query', // AdGuard
+  'https://dns.quad9.net/dns-query', // IBM Quad9
+  'tls://one.one.one.one:853' // Cloudflare
+]
+// DNS配置
+const dnsConfig = {
+  enable: true,
+  listen: '0.0.0.0:1053',
+  ipv6: false,
+  /**
+   * 是否查询系统 hosts
+   */
+  'use-system-hosts': true,
+  /**
+   * 是否回应配置中的 hosts
+   */
+  'use-hosts': true,
+  'cache-algorithm': 'arc',
+  'enhanced-mode': 'fake-ip',
+  'fake-ip-range': '198.18.0.1/16',
+  /**
+   * fake ip 过滤
+   * 以下地址不会下发 fake ip 映射用于连接
+   */
+  'fake-ip-filter': [
+    // 本地主机/设备
+    '+.lan',
+    '+.local',
+    // Windows网络出现小地球图标
+    '+.msftconnecttest.com',
+    '+.msftncsi.com',
+    // QQ快速登录检测失败
+    'localhost.ptlogin2.qq.com',
+    'localhost.sec.qq.com',
+    // 微信快速登录检测失败
+    'localhost.work.weixin.qq.com',
+    '*.snapdrop.net'
+  ],
+  /**
+   * 默认域名服务器
+   * 用于解析 DNS 服务器 的域名
+   */
+  'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1'],
+
+  /**
+   * 直连域名解析的 DNS 服务器，可选
+   * 如果不填则遵循nameserver-policy、nameserver和fallback的配置
+   */
+  'direct-nameserver': ['system'],
+  /**
+   * 是否再次匹配nameserver-policy
+   * 仅当配置direct-nameserver时生效
+   * 默认不遵守，直接使用direct-nameserver解析
+   * 若遵守，则匹配nameserver-policy并查询，域名匹配失败使用direct-nameserver解析
+   */
+  'direct-nameserver-follow-policy': false,
+
+  /**
+   * 代理域名解析服务器
+   * 不填则遵循nameserver-policy、nameserver和fallback的配置
+   */
+  'proxy-server-nameserver': foreignNameservers,
+  /**
+   * dns 连接遵守路由规则
+   * 需配置 proxy-server-nameserver
+   */
+  'respect-rules': false,
+
+  /**
+   * 域名查询的解析服务器
+   * 键支持域名通配、geosite；值支持字符串/数组
+   * 匹配为并发查询，匹配成功返回IP；未匹配，继续匹配fallback规则
+   */
+  'nameserver-policy': {
+    // '+.arpa': '10.0.0.1',
+    'geosite:private,cn,geolocation-cn': domesticNameservers,
+    'geosite:google,youtube,telegram,gfw,geolocation-!cn': foreignNameservers
+  },
+
+  /**
+   * 后备域名解析服务器
+   * 并发查询，一般情况下使用境外 DNS, 保证结果可信
+   * 配置 fallback后默认启用 fallback-filter,geoip-code为 cn
+   * 匹配成功，返回IP；
+   * 匹配失败，继续nameserver
+   */
+  fallback: [
+    '1.0.0.1',
+    '8.8.4.4',
+    '80.80.81.81',
+    'https://doh.dns.sb/dns-query', // DNS.SB
+    'https://dns.twnic.tw/dns-query', // 台湾101
+    'https://dns.adguard.com/dns-query', // AdGuard
+    'https://dns.quad9.net/dns-query', // IBM Quad9
+    'tls://one.one.one.one:853' // Cloudflare
+  ],
+  /**
+   * 后备域名解析服务器筛选
+   * 满足条件的将使用 fallback 结果 或 只使用 fallback解析
+   */
+  'fallback-filter': {
+    geoip: true,
+    // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
+    'geoip-code': 'CN',
+    // geosite 列表的内容被视为已污染，匹配到 geosite 的域名，将只使用 fallback解析，不去使用 nameserver
+    geosite: ['gfw'],
+    // 网段的结果会被视为污染
+    ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
+    // 域名被视为已污染
+    domain: ['+.google.com']
+  },
+
+  /**
+   * 默认的域名解析服务器
+   * 并发查询，解析ip
+   * 将解析的ip再次匹配 fallback 的 ip 规则
+   * 匹配成功，fallback对原域名并发查询
+   * 匹配失败，返回ip
+   */
+  nameserver: [...domesticNameservers, ...foreignNameservers]
+}
+
 const areaGroupRegs = {
   '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/ },
   '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/ },
@@ -243,82 +381,7 @@ const rules = [
   'MATCH,🐟 漏网之鱼'
 ]
 
-// 国内DNS服务器
-const domesticNameservers = [
-  '119.29.29.29', // 腾讯
-  '223.5.5.5', // 阿里
-  'https://1.12.12.12/dns-query', // 腾讯
-  'https://223.5.5.5/dns-query', // 阿里
-  'tls://1.12.12.12:853', // 腾讯
-  'tls://dns.alidns.com:853' // 阿里
-]
-// 国外DNS服务器
-const foreignNameservers = [
-  '1.0.0.1',
-  '8.8.4.4',
-  '80.80.81.81',
-  'https://doh.dns.sb/dns-query', // DNS.SB
-  'https://dns.twnic.tw/dns-query', // 台湾101
-  'https://dns.adguard.com/dns-query', // AdGuard
-  'https://dns.quad9.net/dns-query', // IBM Quad9
-  'tls://one.one.one.one:853' // Cloudflare
-]
-const dnsConfig = {
-  enable: true,
-  listen: '0.0.0.0:53',
-  ipv6: false,
-  'use-hosts': true,
-  'enhanced-mode': 'fake-ip',
-  'fake-ip-range': '198.18.0.1/16',
-  /**
-   * fake ip 过滤
-   * 此列表中的主机名将不会使用 Fake IP 解析
-   * 即, 对这些域名的请求将始终使用其真实 IP 地址进行响应
-   */
-  'fake-ip-filter': [
-    '*.lan',
-    '*.local',
-    'localhost.ptlogin2.qq.com',
-    '*.snapdrop.net'
-  ],
-
-  /**
-   * 默认域名服务器
-   * 用于解析 DNS 服务器 的域名，仅支持ip
-   */
-  'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1'],
-  /**
-   * 域名服务器
-   * 支持 UDP、TCP、DoT、DoH
-   * Clash 使用第一个收到的响应作为 DNS 查询的结果
-   */
-  nameserver: [...domesticNameservers, ...foreignNameservers],
-  /**
-   * 后备域名解析服务器
-   * 当 fallback 存在时, DNS服务器将向此部分中的服务器与 nameservers 中的服务器发送并发请求
-   * 当 GEOIP 国家不是CN时, 将使用 fallback 服务器的响应
-   */
-  fallback: foreignNameservers,
-  /**
-   * 后备域名解析服务器过滤器
-   * 如果使用 nameservers 解析的 IP 地址在下面指定的子网中,则认为它们无效, 并使用 fallback 服务器的结果
-   * 当 fallback-filter.geoip 为 true 且 IP 地址的 GEOIP 为 CN 时,将使用 nameservers 服务器解析的 IP 地址
-   * 如果 fallback-filter.geoip 为 false, 且不匹配 fallback-filter.ipcidr,则始终使用 nameservers 服务器的结果
-   */
-  'fallback-filter': {
-    geoip: true,
-    'geoip-code': 'CN',
-    ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
-    domain: ['+.google.com']
-  }
-}
-
-async function main(
-  raw,
-  { axios, yaml, notify, console },
-  { name, url, interval, selected }
-) {
-  const clashMeta = yaml.parse(raw)
+function main(clashMeta, profileName) {
   const { proxies } = clashMeta
   const proxyGroups = proxyGroupsGenerator(proxies)
 
@@ -326,7 +389,5 @@ async function main(
   clashMeta['proxy-groups'] = proxyGroups
   clashMeta['rule-providers'] = ruleProviders
   clashMeta['rules'] = rules
-  return yaml.stringify(clashMeta)
+  return clashMeta
 }
-
-module.exports.parse = main
