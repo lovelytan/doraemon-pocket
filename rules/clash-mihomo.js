@@ -21,7 +21,7 @@ const foreignNameservers = [
 // DNS配置
 const dnsConfig = {
   enable: true,
-  listen: '0.0.0.0:1053',
+  listen: '0.0.0.0:53',
   ipv6: false,
   /**
    * 是否查询系统 hosts
@@ -54,51 +54,67 @@ const dnsConfig = {
   ],
   /**
    * 默认域名服务器
-   * 用于解析 DNS 服务器 的域名
+   * 用于解析 DNS服务器 的域名
+   * 只能使用纯 IP 地址，可使用加密 DNS
    */
-  'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1'],
+  'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1', 'system'],
 
   /**
    * 直连域名解析的 DNS 服务器，可选
-   * 如果不填则遵循nameserver-policy、nameserver和fallback的配置
+   * 直接通过配置的dns直接解析
+   * 不配置则遵循nameserver-policy、nameserver和fallback的配置
+   * PS.若配置了此项，nameserver-policy、nameserver、fallback解析的ip命中直连会由此项dns重新解析
    */
   'direct-nameserver': ['system'],
   /**
    * 是否再次匹配nameserver-policy
    * 仅当配置direct-nameserver时生效
    * 默认不遵守，直接使用direct-nameserver解析
-   * 若遵守，则匹配nameserver-policy并查询，域名匹配失败使用direct-nameserver解析
+   * 若遵守，则匹配nameserver-policy查询，域名匹配失败使用direct-nameserver解析
    */
   'direct-nameserver-follow-policy': false,
 
   /**
-   * 代理域名解析服务器
+   * 代理域名解析服务器，可选
+   * 通过配置的dns直接解析
    * 不填则遵循nameserver-policy、nameserver和fallback的配置
    */
   'proxy-server-nameserver': foreignNameservers,
   /**
-   * dns 连接遵守路由规则
-   * 需配置 proxy-server-nameserver
+   * dns 连接遵守rules规则
+   * 配置后面的nameserver、fallback和nameserver-policy向dns服务器的连接过程是否遵守遵守rules规则
+   * 如果为false（默认值）则这三部分的dns服务器在未特别指定的情况下会直连
+   * 如果为true，将会按照rules的规则匹配链接方式（走代理或直连），如果有特别指定则任然以指定值为准
+   * 仅当proxy-server-nameserver非空时可以开启此选项, 强烈不建议和prefer-h3一起使用
+   * 此外，这三者配置中的dns服务器如果出现域名会采用default-nameserver配置项解析，也请确保正确配置default-nameserver
    */
-  'respect-rules': false,
+  'respect-rules': true,
 
   /**
-   * 域名查询的解析服务器
+   * dns策略，可选
    * 键支持域名通配、geosite；值支持字符串/数组
-   * 匹配为并发查询，匹配成功返回IP；未匹配，继续匹配fallback规则
+   * 匹配成功，通过配置的dns直接解析
+   * 匹配失败，进入nameserver、fallback流程
    */
   'nameserver-policy': {
     // '+.arpa': '10.0.0.1',
-    'geosite:private,cn,geolocation-cn': domesticNameservers,
+    'geosite:private,cn,geolocation-cn,apple': domesticNameservers,
     'geosite:google,youtube,telegram,gfw,geolocation-!cn': foreignNameservers
   },
 
   /**
+   * DNS主要域名配置
+   * 配置fallback，进入fallback流程
+   * 未配置fallback，解析ip
+   */
+  nameserver: [...domesticNameservers, ...foreignNameservers],
+
+  /**
    * 后备域名解析服务器
-   * 并发查询，一般情况下使用境外 DNS, 保证结果可信
+   * 一般情况下使用境外 DNS, 保证结果可信
    * 配置 fallback后默认启用 fallback-filter,geoip-code为 cn
-   * 匹配成功，返回IP；
-   * 匹配失败，继续nameserver
+   * fallback与nameserver并发查询
+   * nameserver 中返回的 IP 不是 CN，则使用 fallback 中的 DNS 查询结果
    */
   fallback: [
     '1.0.0.1',
@@ -112,7 +128,7 @@ const dnsConfig = {
   ],
   /**
    * 后备域名解析服务器筛选
-   * 满足条件的将使用 fallback 结果 或 只使用 fallback解析
+   * 满足条件的将使用 fallback 结果，否则使用nameserver结果
    */
   'fallback-filter': {
     geoip: true,
@@ -124,16 +140,7 @@ const dnsConfig = {
     ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
     // 域名被视为已污染
     domain: ['+.google.com']
-  },
-
-  /**
-   * 默认的域名解析服务器
-   * 并发查询，解析ip
-   * 将解析的ip再次匹配 fallback 的 ip 规则
-   * 匹配成功，fallback对原域名并发查询
-   * 匹配失败，返回ip
-   */
-  nameserver: [...domesticNameservers, ...foreignNameservers]
+  }
 }
 
 const areaGroupRegs = {
@@ -385,6 +392,7 @@ function main(clashMeta, profileName) {
   const { proxies } = clashMeta
   const proxyGroups = proxyGroupsGenerator(proxies)
 
+  clashMeta['mixed-port'] = 7890
   clashMeta['dns'] = dnsConfig
   clashMeta['proxy-groups'] = proxyGroups
   clashMeta['rule-providers'] = ruleProviders
