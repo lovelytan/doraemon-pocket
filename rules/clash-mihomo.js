@@ -3,18 +3,23 @@
  */
 // 国内DNS服务器
 const cnNameservers = [
-  'https://1.12.12.12/dns-query', // 腾讯
-  'https://223.5.5.5/dns-query', // 阿里
-  'tls://1.12.12.12:853', // 腾讯
+  'https://doh.pub/dns-query', // 腾讯
+  'https://sm2.doh.pub/dns-query', // 腾讯（国密）
+  'https://dns.alidns.com/dns-query', // 阿里
+  'tls://dot.pub:853', // 腾讯
   'tls://dns.alidns.com:853' // 阿里
 ]
 // 国外DNS服务器
 const foreignNameservers = [
-  'https://doh.dns.sb/dns-query', // DNS.SB
-  'https://dns.twnic.tw/dns-query', // 台湾101
-  'https://dns.adguard.com/dns-query', // AdGuard
+  'https://dns.google/dns-query', // google
+  'https://cloudflare-dns.com/dns-query', // Cloudflare
   'https://dns.quad9.net/dns-query', // IBM Quad9
-  'tls://one.one.one.one:853' // Cloudflare
+  'https://doh.opendns.com/dns-query', // openDNS
+  'https://dns.twnic.tw/dns-query', // 台湾101
+  'https://doh.dns.sb/dns-query', // DNS.SB
+  'tls://dns.google:853', // google
+  'tls://one.one.one.one:853', // Cloudflare
+  'tls://dot.sb:853' // DNS.SB
 ]
 // DNS配置
 const dnsConfig = {
