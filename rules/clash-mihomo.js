@@ -1,7 +1,8 @@
+/**
+ * DNS
+ */
 // 国内DNS服务器
-const domesticNameservers = [
-  '119.29.29.29', // 腾讯
-  '223.5.5.5', // 阿里
+const cnNameservers = [
   'https://1.12.12.12/dns-query', // 腾讯
   'https://223.5.5.5/dns-query', // 阿里
   'tls://1.12.12.12:853', // 腾讯
@@ -9,9 +10,6 @@ const domesticNameservers = [
 ]
 // 国外DNS服务器
 const foreignNameservers = [
-  '1.0.0.1',
-  '8.8.4.4',
-  '80.80.81.81',
   'https://doh.dns.sb/dns-query', // DNS.SB
   'https://dns.twnic.tw/dns-query', // 台湾101
   'https://dns.adguard.com/dns-query', // AdGuard
@@ -98,7 +96,7 @@ const dnsConfig = {
    */
   'nameserver-policy': {
     // '+.arpa': '10.0.0.1',
-    'geosite:private,cn,geolocation-cn,apple': domesticNameservers,
+    'geosite:private,cn,geolocation-cn,apple': cnNameservers,
     'geosite:google,youtube,telegram,gfw,geolocation-!cn': foreignNameservers
   },
 
@@ -107,7 +105,7 @@ const dnsConfig = {
    * 配置fallback，进入fallback流程
    * 未配置fallback，解析ip
    */
-  nameserver: [...domesticNameservers, ...foreignNameservers],
+  nameserver: [...cnNameservers, ...foreignNameservers],
 
   /**
    * 后备域名解析服务器
@@ -143,6 +141,9 @@ const dnsConfig = {
   }
 }
 
+/**
+ * 分组
+ */
 const areaGroupRegs = {
   '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/ },
   '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/ },
@@ -250,6 +251,9 @@ const proxyGroupsGenerator = proxies => {
   ]
 }
 
+/**
+ * 规则
+ */
 const ruleProviders = {
   Apple: {
     type: 'http',
@@ -388,6 +392,9 @@ const rules = [
   'MATCH,🐟 漏网之鱼'
 ]
 
+/**
+ * 入口函数
+ */
 function main(clashMeta, profileName) {
   const { proxies } = clashMeta
   const proxyGroups = proxyGroupsGenerator(proxies)
