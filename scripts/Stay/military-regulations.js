@@ -8,7 +8,7 @@
 // @match        https://ks.wjx.com/*
 // @grant        none
 // @updateURL    https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
-// @downloadURL    https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
+// @downloadURL  https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
 // ==/UserScript==
 ;(function () {
   'use strict'
