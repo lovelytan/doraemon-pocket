@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         军规
 // @namespace    https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
-// @version      0.0.2
+// @version      0.0.3
 // @description  Template userscript created by Stay
 // @author       You
 // @match        https://kaoshi.wjx.top/*
