@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         军规
-// @namespace    https://staybrowser.com/
-// @version      0.1
+// @namespace    https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
+// @version      0.0.2
 // @description  Template userscript created by Stay
 // @author       You
 // @match        https://kaoshi.wjx.top/*
 // @match        https://ks.wjx.com/*
 // @grant        none
+// @updateURL    https://raw.githubusercontent.com/lovelytan/doraemon-pocket/refs/heads/dev/scripts/Stay/military-regulations.js
 // ==/UserScript==
 ;(function () {
   'use strict'
