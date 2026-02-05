@@ -242,6 +242,14 @@ const ruleProviders = {
     path: './ruleset/Claude.yaml',
     interval: 86400
   },
+  Gemini: {
+    type: 'http',
+    behavior: 'classical',
+    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml',
+    format: 'yaml',
+    path: './ruleset/Gemini.yaml',
+    interval: 86400
+  },
   Google: {
     type: 'http',
     behavior: 'classical',
@@ -307,6 +315,7 @@ const rules = [
   'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
+  'RULE-SET,Gemini,💬 人工智能',
   'RULE-SET,Download,⬇️ 低倍节点',
   'RULE-SET,Game,🎮 游戏平台',
   'RULE-SET,Apple,DIRECT',
