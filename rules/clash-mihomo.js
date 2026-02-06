@@ -399,10 +399,10 @@ function main(clashMeta, profileName) {
   const { proxies } = clashMeta
   const proxyGroups = proxyGroupsGenerator(proxies)
 
-  clashMeta['mixed-port'] = 7890
   clashMeta['dns'] = dnsConfig
   clashMeta['proxy-groups'] = proxyGroups
   clashMeta['rule-providers'] = ruleProviders
-  clashMeta['rules'] = rules
+  clashMeta['rules'] = [...(clashMeta['prepend-rules'] || []), ...rules]
+
   return clashMeta
 }
