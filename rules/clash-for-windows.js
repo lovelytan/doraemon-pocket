@@ -21,10 +21,12 @@ const foreignNameservers = [
   'tls://one.one.one.one:853', // Cloudflare
   'tls://dot.sb:853' // DNS.SB
 ]
+// DNS配置
 const dnsConfig = {
   enable: true,
   listen: '0.0.0.0:53',
   ipv6: false,
+  // 是否回应配置中的 hosts
   'use-hosts': true,
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.18.0.1/16',
@@ -34,12 +36,20 @@ const dnsConfig = {
    * 即, 对这些域名的请求将始终使用其真实 IP 地址进行响应
    */
   'fake-ip-filter': [
+    // 本地主机/设备
     '*.lan',
     '*.local',
+    // Windows网络出现小地球图标
+    '+.msftconnecttest.com',
+    '+.msftncsi.com',
+    // QQ快速登录检测失败
     'localhost.ptlogin2.qq.com',
+    'localhost.sec.qq.com',
+    // 微信快速登录检测失败
+    'localhost.work.weixin.qq.com',
+    // 其他
     '*.snapdrop.net'
   ],
-
   /**
    * 默认域名服务器
    * 用于解析 DNS 服务器 的域名，仅支持ip
@@ -53,12 +63,14 @@ const dnsConfig = {
   nameserver: [...cnNameservers, ...foreignNameservers],
   /**
    * 后备域名解析服务器
+   * 一般情况下使用境外 DNS, 保证结果可信
    * 当 fallback 存在时, DNS服务器将向此部分中的服务器与 nameservers 中的服务器发送并发请求
-   * 当 GEOIP 国家不是CN时, 将使用 fallback 服务器的响应
+   * 当 nameserver 返回 GEOIP 国家不是CN时, 则使用 fallback 中的 DNS 查询结果
    */
   fallback: foreignNameservers,
   /**
-   * 后备域名解析服务器过滤器
+   * 后备域名解析服务器过滤
+   * 满足条件的将使用 fallback 结果，否则使用nameserver结果
    * 如果使用 nameservers 解析的 IP 地址在下面指定的子网中,则认为它们无效, 并使用 fallback 服务器的结果
    * 当 fallback-filter.geoip 为 true 且 IP 地址的 GEOIP 为 CN 时,将使用 nameservers 服务器解析的 IP 地址
    * 如果 fallback-filter.geoip 为 false, 且不匹配 fallback-filter.ipcidr,则始终使用 nameservers 服务器的结果
@@ -66,7 +78,9 @@ const dnsConfig = {
   'fallback-filter': {
     geoip: true,
     'geoip-code': 'CN',
+    // 网段的结果会被视为污染
     ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
+    // 域名被视为已污染
     domain: ['+.google.com']
   }
 }

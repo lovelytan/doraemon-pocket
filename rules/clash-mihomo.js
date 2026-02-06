@@ -26,25 +26,22 @@ const dnsConfig = {
   enable: true,
   listen: '0.0.0.0:53',
   ipv6: false,
-  /**
-   * 是否查询系统 hosts
-   */
-  'use-system-hosts': true,
-  /**
-   * 是否回应配置中的 hosts
-   */
+  // 是否回应配置中的 hosts
   'use-hosts': true,
+  // 是否查询系统 hosts
+  'use-system-hosts': true,
   'cache-algorithm': 'arc',
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.18.0.1/16',
   /**
    * fake ip 过滤
-   * 以下地址不会下发 fake ip 映射用于连接
+   * 此列表中的主机名将不会使用 Fake IP 解析
+   * 即, 对这些域名的请求将始终使用其真实 IP 地址进行响应
    */
   'fake-ip-filter': [
     // 本地主机/设备
-    '+.lan',
-    '+.local',
+    '*.lan',
+    '*.local',
     // Windows网络出现小地球图标
     '+.msftconnecttest.com',
     '+.msftncsi.com',
@@ -53,15 +50,14 @@ const dnsConfig = {
     'localhost.sec.qq.com',
     // 微信快速登录检测失败
     'localhost.work.weixin.qq.com',
+    // 其他
     '*.snapdrop.net'
   ],
   /**
    * 默认域名服务器
-   * 用于解析 DNS服务器 的域名
-   * 只能使用纯 IP 地址，可使用加密 DNS
+   * 用于解析 DNS 服务器 的域名，仅支持ip
    */
   'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1', 'system'],
-
   /**
    * 直连域名解析的 DNS 服务器，可选
    * 直接通过配置的dns直接解析
@@ -76,7 +72,6 @@ const dnsConfig = {
    * 若遵守，则匹配nameserver-policy查询，域名匹配失败使用direct-nameserver解析
    */
   'direct-nameserver-follow-policy': false,
-
   /**
    * 代理域名解析服务器，可选
    * 通过配置的dns直接解析
@@ -92,46 +87,36 @@ const dnsConfig = {
    * 此外，这三者配置中的dns服务器如果出现域名会采用default-nameserver配置项解析，也请确保正确配置default-nameserver
    */
   'respect-rules': true,
-
   /**
    * dns策略，可选
+   * 优先于 nameserver/fallback 查询
    * 键支持域名通配、geosite；值支持字符串/数组
    * 匹配成功，通过配置的dns直接解析
    * 匹配失败，进入nameserver、fallback流程
    */
-  'nameserver-policy': {
-    // '+.arpa': '10.0.0.1',
-    'geosite:private,cn,geolocation-cn,apple': cnNameservers,
-    'geosite:google,youtube,telegram,gfw,geolocation-!cn': foreignNameservers
-  },
-
+  // 'nameserver-policy': {
+  //   'geosite:private,cn,geolocation-cn,apple': cnNameservers,
+  //   'geosite:google,youtube,telegram,gfw,geolocation-!cn': foreignNameservers
+  // },
   /**
-   * DNS主要域名配置
-   * 配置fallback，进入fallback流程
-   * 未配置fallback，解析ip
+   * 域名服务器
+   * 支持 UDP、TCP、DoT、DoH
+   * Clash 使用第一个收到的响应作为 DNS 查询的结果
    */
   nameserver: [...cnNameservers, ...foreignNameservers],
-
   /**
    * 后备域名解析服务器
    * 一般情况下使用境外 DNS, 保证结果可信
-   * 配置 fallback后默认启用 fallback-filter,geoip-code为 cn
-   * fallback与nameserver并发查询
-   * nameserver 中返回的 IP 不是 CN，则使用 fallback 中的 DNS 查询结果
+   * 当 fallback 存在时, DNS服务器将向此部分中的服务器与 nameservers 中的服务器发送并发请求
+   * 当 nameserver 返回 GEOIP 国家不是CN时, 则使用 fallback 中的 DNS 查询结果
    */
-  fallback: [
-    '1.0.0.1',
-    '8.8.4.4',
-    '80.80.81.81',
-    'https://doh.dns.sb/dns-query', // DNS.SB
-    'https://dns.twnic.tw/dns-query', // 台湾101
-    'https://dns.adguard.com/dns-query', // AdGuard
-    'https://dns.quad9.net/dns-query', // IBM Quad9
-    'tls://one.one.one.one:853' // Cloudflare
-  ],
+  fallback: foreignNameservers,
   /**
-   * 后备域名解析服务器筛选
+   * 后备域名解析服务器过滤
    * 满足条件的将使用 fallback 结果，否则使用nameserver结果
+   * 如果使用 nameservers 解析的 IP 地址在下面指定的子网中,则认为它们无效, 并使用 fallback 服务器的结果
+   * 当 fallback-filter.geoip 为 true 且 IP 地址的 GEOIP 为 CN 时,将使用 nameservers 服务器解析的 IP 地址
+   * 如果 fallback-filter.geoip 为 false, 且不匹配 fallback-filter.ipcidr,则始终使用 nameservers 服务器的结果
    */
   'fallback-filter': {
     geoip: true,
@@ -212,7 +197,12 @@ const proxyGroupsGenerator = proxies => {
     {
       name: '🚀 节点选择',
       type: 'select',
-      proxies: ['🗺 地区节点', 'DIRECT', ...proxies.map(item => item.name)]
+      proxies: [
+        '🗺 地区节点',
+        '⬇️ 低倍节点',
+        ...proxies.map(item => item.name),
+        'DIRECT'
+      ]
     },
     {
       name: '🗺 地区节点',
@@ -222,11 +212,7 @@ const proxyGroupsGenerator = proxies => {
     {
       name: '⬇️ 低倍节点',
       type: 'select',
-      proxies: [
-        'DIRECT',
-        '🚀 节点选择',
-        ...(customProxyGroup['⬇️ 低倍节点']?.proxies || [])
-      ]
+      proxies: ['DIRECT', ...(customProxyGroup['⬇️ 低倍节点']?.proxies || [])]
     },
     {
       name: '💬 人工智能',
@@ -316,6 +302,14 @@ const ruleProviders = {
     path: './ruleset/Claude.yaml',
     interval: 86400
   },
+  Gemini: {
+    type: 'http',
+    behavior: 'classical',
+    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Gemini/Gemini.yaml',
+    format: 'yaml',
+    path: './ruleset/Gemini.yaml',
+    interval: 86400
+  },
   Google: {
     type: 'http',
     behavior: 'classical',
@@ -381,6 +375,7 @@ const rules = [
   'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
+  'RULE-SET,Gemini,💬 人工智能',
   'RULE-SET,Download,⬇️ 低倍节点',
   'RULE-SET,Game,🎮 游戏平台',
   'RULE-SET,Apple,DIRECT',
