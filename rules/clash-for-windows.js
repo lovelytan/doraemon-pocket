@@ -321,6 +321,7 @@ const ruleProviders = {
   }
 }
 const rules = [
+  'DOMAIN-SUFFIX,release-assets.githubusercontent.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
