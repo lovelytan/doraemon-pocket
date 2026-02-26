@@ -135,12 +135,12 @@ const dnsConfig = {
  * 分组
  */
 const areaGroupRegs = {
-  '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/ },
-  '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/ },
-  '🇯🇵 日本节点': { reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/ },
-  '🇸🇬 新加坡节点': { reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/ },
-  '🇰🇷 韩国节点': { reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/ },
-  '🇺🇲 美国节点': { reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/ },
+  '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/i },
+  '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/i },
+  '🇯🇵 日本节点': { reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/i },
+  '🇸🇬 新加坡节点': { reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/i },
+  '🇰🇷 韩国节点': { reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/i },
+  '🇺🇲 美国节点': { reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/i },
   '🏳️‍🌈 其他地区': { reg: /^(?!.*游戏).*/ }
 }
 const customGroupRegs = {
@@ -220,13 +220,14 @@ const proxyGroupsGenerator = proxies => {
       proxies: [
         ...(customProxyGroup['💬 人工智能']?.proxies || []),
         ...areaProxyGroupName,
+        ...proxies.map(item => item.name),
         'DIRECT'
       ]
     },
     {
       name: '🎮 游戏平台',
       type: 'select',
-      proxies: ['🚀 节点选择', 'DIRECT']
+      proxies: ['🚀 节点选择', ...proxies.map(item => item.name), 'DIRECT']
     },
     ...areaProxyGroup,
     {
@@ -367,7 +368,7 @@ const ruleProviders = {
   }
 }
 const rules = [
-  'DOMAIN-SUFFIX,release-assets.githubusercontent.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',

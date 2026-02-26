@@ -1,8 +1,9 @@
 /**
  * DNS
  */
+const defaultNameserver = ['119.29.29.29', '223.5.5.5', '1.0.0.1']
 // 国内DNS服务器
-const cnNameservers = [
+const cnNameserver = [
   'https://doh.pub/dns-query', // 腾讯
   'https://sm2.doh.pub/dns-query', // 腾讯（国密）
   'https://dns.alidns.com/dns-query', // 阿里
@@ -10,7 +11,7 @@ const cnNameservers = [
   'tls://dns.alidns.com:853' // 阿里
 ]
 // 国外DNS服务器
-const foreignNameservers = [
+const foreignNameserver = [
   'https://dns.google/dns-query', // google
   'https://cloudflare-dns.com/dns-query', // Cloudflare
   'https://dns.quad9.net/dns-query', // IBM Quad9
@@ -54,20 +55,20 @@ const dnsConfig = {
    * 默认域名服务器
    * 用于解析 DNS 服务器 的域名，仅支持ip
    */
-  'default-nameserver': ['119.29.29.29', '223.5.5.5', '1.0.0.1'],
+  'default-nameserver': defaultNameserver,
   /**
    * 域名服务器
    * 支持 UDP、TCP、DoT、DoH
    * Clash 使用第一个收到的响应作为 DNS 查询的结果
    */
-  nameserver: [...cnNameservers, ...foreignNameservers],
+  nameserver: [...cnNameserver, ...foreignNameserver],
   /**
    * 后备域名解析服务器
    * 一般情况下使用境外 DNS, 保证结果可信
    * 当 fallback 存在时, DNS服务器将向此部分中的服务器与 nameservers 中的服务器发送并发请求
    * 当 nameserver 返回 GEOIP 国家不是CN时, 则使用 fallback 中的 DNS 查询结果
    */
-  fallback: foreignNameservers,
+  fallback: foreignNameserver,
   /**
    * 后备域名解析服务器过滤
    * 满足条件的将使用 fallback 结果，否则使用nameserver结果
@@ -89,12 +90,12 @@ const dnsConfig = {
  * 分组
  */
 const areaGroupRegs = {
-  '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/ },
-  '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/ },
-  '🇯🇵 日本节点': { reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/ },
-  '🇸🇬 新加坡节点': { reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/ },
-  '🇰🇷 韩国节点': { reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/ },
-  '🇺🇲 美国节点': { reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/ },
+  '🇭🇰 香港节点': { reg: /^(?!.*游戏).*(香港|🇭🇰|HongKong|HK)+(.*)$/i },
+  '🇨🇳 台湾节点': { reg: /^(?!.*游戏).*(台湾|🇨🇳|Taiwan|TW)+(.*)$/i },
+  '🇯🇵 日本节点': { reg: /^(?!.*游戏).*(日本|🇯🇵|Japan|JP|东京)+(.*)$/i },
+  '🇸🇬 新加坡节点': { reg: /^(?!.*游戏).*(新加坡|🇸🇬|Singapore|SG|狮城)+(.*)$/i },
+  '🇰🇷 韩国节点': { reg: /^(?!.*游戏).*(韩国|🇰🇷|Korea|Kr)+(.*)/i },
+  '🇺🇲 美国节点': { reg: /^(?!.*游戏).*(美国|🇺🇸|American|US)+(.*)$/i },
   '🏳️‍🌈 其他地区': { reg: /^(?!.*游戏).*/ }
 }
 const customGroupRegs = {
@@ -174,13 +175,14 @@ const proxyGroupsGenerator = proxies => {
       proxies: [
         ...(customProxyGroup['💬 人工智能']?.proxies || []),
         ...areaProxyGroupName,
+        ...proxies.map(item => item.name),
         'DIRECT'
       ]
     },
     {
       name: '🎮 游戏平台',
       type: 'select',
-      proxies: ['🚀 节点选择', 'DIRECT']
+      proxies: ['🚀 节点选择', ...proxies.map(item => item.name), 'DIRECT']
     },
     ...areaProxyGroup,
     {
@@ -321,7 +323,7 @@ const ruleProviders = {
   }
 }
 const rules = [
-  'DOMAIN-SUFFIX,release-assets.githubusercontent.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
