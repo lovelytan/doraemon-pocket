@@ -1,88 +1,57 @@
 /**
  * DNS
  */
-const defaultNameserver = ['119.29.29.29', '223.5.5.5', '1.0.0.1']
+const defaultNameserver = ['119.29.29.29', '223.5.5.5']
 // 国内DNS服务器
-const cnNameserver = [
+const cnDNS = [
   'https://doh.pub/dns-query', // 腾讯
-  'https://sm2.doh.pub/dns-query', // 腾讯（国密）
-  'https://dns.alidns.com/dns-query', // 阿里
-  'tls://dot.pub:853', // 腾讯
-  'tls://dns.alidns.com:853' // 阿里
+  'https://dns.alidns.com/dns-query' // 阿里
 ]
 // 国外DNS服务器
-const foreignNameserver = [
-  'https://dns.google/dns-query', // google
-  'https://cloudflare-dns.com/dns-query', // Cloudflare
-  'https://dns.quad9.net/dns-query', // IBM Quad9
-  'https://doh.opendns.com/dns-query', // openDNS
-  'https://dns.twnic.tw/dns-query', // 台湾101
-  'https://doh.dns.sb/dns-query', // DNS.SB
-  'tls://dns.google:853', // google
-  'tls://one.one.one.one:853', // Cloudflare
-  'tls://dot.sb:853' // DNS.SB
+const foreignDNS = [
+  'tls://8.8.8.8', // google
+  'tls://1.1.1.1', // Cloudflare
+  'tls://9.9.9.9' // Quad9
 ]
 // DNS配置
 const dnsConfig = {
   enable: true,
   listen: '0.0.0.0:53',
   ipv6: false,
-  // 是否回应配置中的 hosts
-  'use-hosts': true,
+
   'enhanced-mode': 'fake-ip',
   'fake-ip-range': '198.18.0.1/16',
-  /**
-   * fake ip 过滤
-   * 此列表中的主机名将不会使用 Fake IP 解析
-   * 即, 对这些域名的请求将始终使用其真实 IP 地址进行响应
-   */
+
+  // fake ip 过滤：此列表中的主机名将不会使用 Fake IP 解析，即对这些域名的请求将始终使用其真实 IP 地址进行响应
   'fake-ip-filter': [
-    // 本地主机/设备
     '*.lan',
     '*.local',
     // Windows网络出现小地球图标
     '+.msftconnecttest.com',
     '+.msftncsi.com',
-    // QQ快速登录检测失败
     'localhost.ptlogin2.qq.com',
     'localhost.sec.qq.com',
-    // 微信快速登录检测失败
-    'localhost.work.weixin.qq.com',
-    // 其他
-    '*.snapdrop.net'
+    'localhost.work.weixin.qq.com'
   ],
-  /**
-   * 默认域名服务器
-   * 用于解析 DNS 服务器 的域名，仅支持ip
-   */
+
+  // 是否回应配置中的 hosts
+  'use-hosts': true,
+
+  // 默认域名服务器：用于解析 DNS 服务器 的域名，必须为 IP
   'default-nameserver': defaultNameserver,
-  /**
-   * 域名服务器
-   * 支持 UDP、TCP、DoT、DoH
-   * Clash 使用第一个收到的响应作为 DNS 查询的结果
-   */
-  nameserver: [...cnNameserver, ...foreignNameserver],
-  /**
-   * 后备域名解析服务器
-   * 一般情况下使用境外 DNS, 保证结果可信
-   * 当 fallback 存在时, DNS服务器将向此部分中的服务器与 nameservers 中的服务器发送并发请求
-   * 当 nameserver 返回 GEOIP 国家不是CN时, 则使用 fallback 中的 DNS 查询结果
-   */
-  fallback: foreignNameserver,
-  /**
-   * 后备域名解析服务器过滤
-   * 满足条件的将使用 fallback 结果，否则使用nameserver结果
-   * 如果使用 nameservers 解析的 IP 地址在下面指定的子网中,则认为它们无效, 并使用 fallback 服务器的结果
-   * 当 fallback-filter.geoip 为 true 且 IP 地址的 GEOIP 为 CN 时,将使用 nameservers 服务器解析的 IP 地址
-   * 如果 fallback-filter.geoip 为 false, 且不匹配 fallback-filter.ipcidr,则始终使用 nameservers 服务器的结果
-   */
+
+  // 域名服务器
+  nameserver: cnDNS,
+
+  // 后备域名解析服务器：一般情况下使用境外 DNS。与nameserver并发查询，将结果匹配 fallback-filter
+  fallback: foreignDNS,
+  // 后备域名解析服务器过滤
   'fallback-filter': {
     geoip: true,
+    // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
     'geoip-code': 'CN',
     // 网段的结果会被视为污染
-    ipcidr: ['240.0.0.0/4', '0.0.0.0/32'],
-    // 域名被视为已污染
-    domain: ['+.google.com']
+    ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
   }
 }
 
@@ -112,7 +81,8 @@ const proxiesFilter = (
       name,
       regExp: item.reg,
       type: item.type || 'url-test',
-      url: 'http://www.gstatic.com/generate_204',
+      url: 'http://cp.cloudflare.com/generate_204',
+      // url: 'http://www.gstatic.com/generate_204',
       interval: 300,
       tolerance: 50,
       proxies: []
@@ -322,14 +292,7 @@ const ruleProviders = {
     interval: 86400
   }
 }
-const rules = [
-  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,download-cdn.jetbrains.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
+const ruleSets = [
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
   'RULE-SET,Gemini,💬 人工智能',
@@ -344,7 +307,20 @@ const rules = [
   'RULE-SET,Telegram,🚀 节点选择',
   'RULE-SET,GFW,🚀 节点选择',
   'RULE-SET,China,DIRECT',
-  'RULE-SET,Lan,DIRECT,no-resolve',
+  'RULE-SET,Lan,DIRECT,no-resolve'
+]
+const customRules = [
+  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,download-cdn.jetbrains.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能'
+]
+const rules = [
+  ...customRules,
+  ...ruleSets,
   'GEOIP,CN,DIRECT,no-resolve',
   'MATCH,🐟 漏网之鱼'
 ]
@@ -357,15 +333,15 @@ async function main(
   { axios, yaml, notify, console },
   { name, url, interval, selected }
 ) {
-  const clashMeta = yaml.parse(raw)
-  const { proxies } = clashMeta
+  const clashConfig = yaml.parse(raw)
+  const { proxies } = clashConfig
   const proxyGroups = proxyGroupsGenerator(proxies)
 
-  clashMeta['dns'] = dnsConfig
-  clashMeta['proxy-groups'] = proxyGroups
-  clashMeta['rule-providers'] = ruleProviders
-  clashMeta['rules'] = rules
-  return yaml.stringify(clashMeta)
+  clashConfig['dns'] = dnsConfig
+  clashConfig['proxy-groups'] = proxyGroups
+  clashConfig['rule-providers'] = ruleProviders
+  clashConfig['rules'] = rules
+  return yaml.stringify(clashConfig)
 }
 
 module.exports.parse = main
