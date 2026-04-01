@@ -69,7 +69,8 @@ const areaGroupRegs = {
 }
 const customGroupRegs = {
   '⬇️ 低倍节点': { reg: /(?<![0-9])0\.[0-9]+|低倍/ },
-  '💬 人工智能': { reg: /^(?!.*游戏).*(ai|gpt)+(.*)/i }
+  '💬 人工智能': { reg: /^(?!.*游戏).*(ai|gpt)+(.*)/i },
+  '⌨️ 氛围编程': { reg: /^(?!.*游戏).*(ai|gpt)+(.*)/i }
 }
 const proxiesFilter = (
   proxies,
@@ -144,6 +145,16 @@ const proxyGroupsGenerator = proxies => {
       type: 'select',
       proxies: [
         ...(customProxyGroup['💬 人工智能']?.proxies || []),
+        ...areaProxyGroupName,
+        ...proxies.map(item => item.name),
+        'DIRECT'
+      ]
+    },
+    {
+      name: '⌨️ 氛围编程',
+      type: 'select',
+      proxies: [
+        ...(customProxyGroup['⌨️ 氛围编程']?.proxies || []),
         ...areaProxyGroupName,
         ...proxies.map(item => item.name),
         'DIRECT'
