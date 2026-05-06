@@ -41,18 +41,18 @@ const dnsConfig = {
   'default-nameserver': defaultNameserver,
 
   // 域名服务器
-  nameserver: cnDNS,
+  nameserver: cnDNS
 
   // 后备域名解析服务器：一般情况下使用境外 DNS。与nameserver并发查询，将结果匹配 fallback-filter
-  fallback: foreignDNS,
+  // fallback: foreignDNS,
   // 后备域名解析服务器过滤
-  'fallback-filter': {
-    geoip: true,
-    // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
-    'geoip-code': 'CN',
-    // 网段的结果会被视为污染
-    ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
-  }
+  // 'fallback-filter': {
+  //   geoip: true,
+  //   // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
+  //   'geoip-code': 'CN',
+  //   // 网段的结果会被视为污染
+  //   ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
+  // }
 }
 
 /**
