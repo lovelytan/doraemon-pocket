@@ -352,6 +352,7 @@ async function main(
   clashConfig['proxy-groups'] = proxyGroups
   clashConfig['rule-providers'] = ruleProviders
   clashConfig['rules'] = rules
+  delete clashConfig['hosts']
   return yaml.stringify(clashConfig)
 }
 
