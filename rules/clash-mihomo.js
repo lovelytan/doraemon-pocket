@@ -85,7 +85,7 @@ const dnsConfig = {
    * 代理节点域名解析服务器
    * 仅用于解析代理节点的域名
    */
-  'proxy-server-nameserver': defaultNameserver,
+  'proxy-server-nameserver': cnDNS,
 
   /**
    * dns 连接遵守rules规则
