@@ -9,9 +9,12 @@ const cnDNS = [
 ]
 // 国外DNS服务器
 const foreignDNS = [
-  'tls://8.8.8.8', // google
-  'tls://1.1.1.1', // Cloudflare
-  'tls://9.9.9.9' // Quad9
+  'https://8.8.8.8/dns-query', // Google
+  'https://1.1.1.1/dns-query', // Cloudflare
+  'https://9.9.9.9/dns-query' // Quad9
+  // 'tls://8.8.8.8', // google
+  // 'tls://1.1.1.1', // Cloudflare
+  // 'tls://9.9.9.9' // Quad9
 ]
 // DNS配置
 const dnsConfig = {
@@ -28,12 +31,44 @@ const dnsConfig = {
   'fake-ip-filter': [
     '*.lan',
     '*.local',
+    '*.localhost',
+    '*.home.arpa',
+    '*.arpa',
+    '*.invalid',
     // Windows网络出现小地球图标
     '+.msftconnecttest.com',
     '+.msftncsi.com',
     'localhost.ptlogin2.qq.com',
     'localhost.sec.qq.com',
-    'localhost.work.weixin.qq.com'
+    'localhost.work.weixin.qq.com',
+    '+.ptlogin2.qq.com',
+    // NTP时间同步：fake-ip会导致时间同步静默失败
+    'time.*.com',
+    'time.*.gov',
+    'time.*.apple.com',
+    'time-ios.apple.com',
+    'ntp.*.com',
+    '+.pool.ntp.org',
+    '*.ntp.org.cn',
+    '*.time.edu.cn',
+    'time.*.edu.cn',
+    // STUN/WebRTC：需要真实IP，防止IP泄露和P2P连接失败
+    '+.stun.*.*',
+    '+.stun.*.*.*',
+    '+.stun.*.*.*.*',
+    'stun.l.google.com',
+    'lens.l.google.com',
+    // 游戏平台：主机联网和反作弊验证需要真实IP
+    '+.xboxlive.com',
+    '+.xbone.online',
+    'xbox.*.microsoft.com',
+    // 小米IoT：智能家居设备发现需要真实IP
+    '+.market.xiaomi.com',
+    'Mijia Cloud',
+    // 国内域名确保真实IP：避免CDN路由异常，部分应用检查IP行为
+    'geosite:cn',
+    // 私有域名确保真实IP：内网域名需正确解析
+    'geosite:private'
   ],
 
   // 是否回应配置中的 hosts
@@ -42,7 +77,7 @@ const dnsConfig = {
   'use-system-hosts': true,
 
   // dns 连接遵守rules规则：需配置 proxy-server-nameserver，强烈不建议和prefer-h3一起使用
-  'respect-rules': false,
+  'respect-rules': true,
 
   // 默认域名服务器：用于解析 DNS 服务器 的域名，必须为 IP, 可为加密 DNS
   'default-nameserver': defaultNameserver,
@@ -53,24 +88,35 @@ const dnsConfig = {
     'geosite:cn': cnDNS
   },
 
-  // 代理域名解析服务器：可选。通过配置的dns直接解析代理域名，不填则遵循nameserver-policy、nameserver和fallback的配置
-  // 'proxy-server-nameserver': foreignDNS, // 可能引发ip冲突
+  // 直连DNS
+  'direct-nameserver': cnDNS,
+  // 不再二次检查nameserver-policy，简化逻辑
+  'direct-nameserver-follow-policy': false,
 
   // 域名服务器
-  nameserver: cnDNS,
+  nameserver: foreignDNS,
+
+  // 代理域名解析服务器：通过配置的dns解析代理域名，即解析proxies配置中的server字段
+  'proxy-server-nameserver': cnDNS,
 
   // 后备域名解析服务器：一般情况下使用境外 DNS。与nameserver并发查询，将结果匹配 fallback-filter
-  fallback: foreignDNS,
+  // fallback: foreignDNS,
+  fallback: [],
+
+  // 默认黑名单模式
+  // 'fake-ip-filter-mode': 'blacklist',
   // 后备域名解析服务器过滤
-  'fallback-filter': {
-    geoip: true,
-    // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
-    'geoip-code': 'CN',
-    // geosite 列表的内容被视为已污染，匹配到 geosite 的域名，将只使用 fallback解析，不去使用 nameserver
-    geosite: ['gfw'],
-    // 网段的结果会被视为污染
-    ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
-  }
+  // 以下地址不会下发 fakeip 映射用于连接
+  'fallback-filter': {}
+  // 'fallback-filter': {
+  //   geoip: true,
+  //   // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
+  //   'geoip-code': 'CN',
+  //   // geosite 列表的内容被视为已污染，匹配到 geosite 的域名，将只使用 fallback解析，不去使用 nameserver
+  //   geosite: ['gfw'],
+  //   // 网段的结果会被视为污染
+  //   ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
+  // }
 }
 
 /**
@@ -104,6 +150,7 @@ const proxiesFilter = (
       // url: 'http://www.gstatic.com/generate_204',
       interval: 300,
       tolerance: 50,
+      lazy: false,
       proxies: []
     }
   })
@@ -361,6 +408,7 @@ function main(clashConfig, profileName) {
   const { proxies } = clashConfig
   const proxyGroups = proxyGroupsGenerator(proxies)
 
+  clashConfig['mixed-port'] = 7890
   clashConfig['dns'] = dnsConfig
   clashConfig['profile'] = {
     ...(clashConfig['profile'] || {}),
