@@ -4,8 +4,8 @@
 const defaultNameserver = ['119.29.29.29', '223.5.5.5']
 // 国内DNS服务器
 const cnDNS = [
-  'https://doh.pub/dns-query', // 腾讯
-  'https://dns.alidns.com/dns-query' // 阿里
+  'https://dns.alidns.com/dns-query', // 阿里
+  'https://doh.pub/dns-query' // 腾讯
 ]
 // 国外DNS服务器
 const foreignDNS = [
@@ -76,47 +76,41 @@ const dnsConfig = {
   // 是否查询系统 hosts
   'use-system-hosts': true,
 
-  // dns 连接遵守rules规则：需配置 proxy-server-nameserver，强烈不建议和prefer-h3一起使用
+  /**
+   * 默认域名服务器
+   * 用于解析 DNS 服务器 的域名，必须为 IP, 可为加密 DNS
+   */
+  'default-nameserver': defaultNameserver,
+  /**
+   * 代理节点域名解析服务器
+   * 仅用于解析代理节点的域名
+   */
+  'proxy-server-nameserver': defaultNameserver,
+
+  /**
+   * dns 连接遵守rules规则
+   * 需配置 proxy-server-nameserver，强烈不建议和prefer-h3一起使用
+   */
   'respect-rules': true,
 
-  // 默认域名服务器：用于解析 DNS 服务器 的域名，必须为 IP, 可为加密 DNS
-  'default-nameserver': defaultNameserver,
-
-  // 指定域名查询的解析服务器：可选。匹配成功，通过配置的dns直接解析；匹配失败，进入nameserver、fallback流程
+  /**
+   * 指定域名查询的解析服务器
+   * 匹配成功，通过配置的dns直接解析；
+   * 匹配失败，进入nameserver、fallback流程
+   */
   'nameserver-policy': {
     'geosite:private': 'system',
-    'geosite:cn': cnDNS
+    'geosite:cn': cnDNS,
+    'geosite:apple-cn': cnDNS
   },
 
-  // 直连DNS
+  // 用于 direct 出口域名解析的 DNS 服务器
   'direct-nameserver': cnDNS,
-  // 不再二次检查nameserver-policy，简化逻辑
+  // 是否遵循 nameserver-policy
   'direct-nameserver-follow-policy': false,
 
   // 域名服务器
-  nameserver: foreignDNS,
-
-  // 代理域名解析服务器：通过配置的dns解析代理域名，即解析proxies配置中的server字段
-  'proxy-server-nameserver': cnDNS,
-
-  // 后备域名解析服务器：一般情况下使用境外 DNS。与nameserver并发查询，将结果匹配 fallback-filter
-  // fallback: foreignDNS,
-  fallback: [],
-
-  // 默认黑名单模式
-  // 'fake-ip-filter-mode': 'blacklist',
-  // 后备域名解析服务器过滤
-  // 以下地址不会下发 fakeip 映射用于连接
-  'fallback-filter': {}
-  // 'fallback-filter': {
-  //   geoip: true,
-  //   // 除了 geoip-code 配置的国家 IP, 其他的 IP 结果会被视为污染
-  //   'geoip-code': 'CN',
-  //   // geosite 列表的内容被视为已污染，匹配到 geosite 的域名，将只使用 fallback解析，不去使用 nameserver
-  //   geosite: ['gfw'],
-  //   // 网段的结果会被视为污染
-  //   ipcidr: ['240.0.0.0/4', '0.0.0.0/32']
-  // }
+  nameserver: foreignDNS
 }
 
 /**
