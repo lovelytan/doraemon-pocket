@@ -381,14 +381,24 @@ const ruleSets = [
   'RULE-SET,Lan,DIRECT,no-resolve'
 ]
 const customRules = [
+  // ai
+  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
+  // github
   'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
+  // debian
   'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
+  // google
   'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
+  // docker
   'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,download-cdn.jetbrains.com, DIRECT',
-  'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn, DIRECT',
-  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能'
+  // jetbrains
+  'DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT',
+  'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
+  'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn,DIRECT',
+  // match
+  'DOMAIN-KEYWORD,downloads,DIRECT',
+  'DOMAIN-KEYWORD,download,DIRECT'
 ]
 const rules = [
   ...customRules,
