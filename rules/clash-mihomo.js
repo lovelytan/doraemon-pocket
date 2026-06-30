@@ -396,9 +396,8 @@ const customRules = [
   'DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT',
   'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
   'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn,DIRECT',
-  // match
-  'DOMAIN-KEYWORD,downloads,DIRECT',
-  'DOMAIN-KEYWORD,download,DIRECT'
+  // claude
+  'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点'
 ]
 const rules = [
   ...customRules,
