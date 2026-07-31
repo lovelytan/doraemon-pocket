@@ -392,6 +392,7 @@ const customRules = [
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
   // docker
   'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,dockerproxy.net,⬇️ 低倍节点',
   // jetbrains
   'DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT',
   'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
