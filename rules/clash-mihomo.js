@@ -349,6 +349,17 @@ function main(clashConfig, profileName) {
     dnsConfig.nameserver = cnDNS
   }
 
+  clashConfig['geo-auto-update'] = true
+  clashConfig['geo-update-interval'] = 24
+  clashConfig['geox-url'] = {
+    mmdb: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb',
+    geoip:
+      'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat',
+    geosite:
+      'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat',
+    asn: 'https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoLite2-ASN.mmdb'
+  }
+
   clashConfig['mixed-port'] = 7890
   clashConfig['dns'] = dnsConfig
   clashConfig['profile'] = {
