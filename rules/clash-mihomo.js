@@ -305,13 +305,18 @@ const rules = [
   ...customRules,
   ...ruleSets,
   'GEOSITE,category-games-!cn,🎮 游戏平台',
-  'GEOSITE,gfw,🚀 节点选择',
+
   'GEOSITE,onedrive,DIRECT',
   'GEOSITE,microsoft@cn,DIRECT',
   'GEOSITE,apple-cn,DIRECT',
-  'GEOSITE,cn,DIRECT',
+
+  'GEOSITE,private,DIRECT',
   'GEOIP,private,DIRECT,no-resolve',
-  'GEOIP,CN,DIRECT',
+
+  'GEOSITE,cn,DIRECT',
+  'GEOIP,CN,DIRECT,no-resolve',
+
+  'GEOSITE,gfw,🚀 节点选择',
   'MATCH,🐟 漏网之鱼'
 ]
 
