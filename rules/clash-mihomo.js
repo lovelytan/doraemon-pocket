@@ -336,6 +336,7 @@ function main(clashConfig, profileName) {
     dnsConfig['proxy-server-nameserver'] = [`udp://${dnsListen}`]
     dnsConfig.nameserver = cnDNS
   }
+
   clashConfig['mixed-port'] = 7890
   clashConfig['dns'] = dnsConfig
   clashConfig['profile'] = {
