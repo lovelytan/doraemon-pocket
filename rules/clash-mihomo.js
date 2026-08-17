@@ -293,18 +293,30 @@ const ruleProviders = {
     format: 'yaml',
     path: './ruleset/Gemini.yaml',
     interval: 86400
+  },
+  Telegram: {
+    type: 'http',
+    behavior: 'classical',
+    url: 'https://raw.githubusercontent.com/ericz15/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml',
+    format: 'yaml',
+    path: './ruleset/Telegram.yaml',
+    interval: 86400
   }
 }
 const ruleSets = [
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
   'RULE-SET,Gemini,💬 人工智能',
-  'RULE-SET,Download,⬇️ 低倍节点'
+  'RULE-SET,Download,⬇️ 低倍节点',
+  'RULE-SET,Telegram,🚀 节点选择'
 ]
 const rules = [
   ...customRules,
   ...ruleSets,
   'GEOSITE,category-games-!cn,🎮 游戏平台',
+
+  'GEOSITE,telegram,🚀 节点选择',
+  'GEOIP,telegram,🚀 节点选择,no-resolve',
 
   'GEOSITE,onedrive,DIRECT',
   'GEOSITE,microsoft@cn,DIRECT',
