@@ -241,39 +241,27 @@ const proxyGroupsGenerator = proxies => {
 /**
  * 规则
  */
+const customRules = [
+  // ai
+  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
+  // github
+  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
+  // debian
+  'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
+  // google
+  'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
+  // docker
+  'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,dockerproxy.net,⬇️ 低倍节点',
+  // jetbrains
+  'DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT',
+  'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
+  'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn,DIRECT',
+  // claude
+  'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点'
+]
 const ruleProviders = {
-  Apple: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Apple/Apple_Classical.yaml',
-    format: 'yaml',
-    path: './ruleset/Apple.yaml',
-    interval: 86400
-  },
-  OneDrive: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/OneDrive/OneDrive.yaml',
-    format: 'yaml',
-    path: './ruleset/OneDrive.yaml',
-    interval: 86400
-  },
-  Microsoft: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Microsoft/Microsoft.yaml',
-    format: 'yaml',
-    path: './ruleset/Microsoft.yaml',
-    interval: 86400
-  },
-  Game: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Game/Game.yaml',
-    format: 'yaml',
-    path: './ruleset/Game.yaml',
-    interval: 86400
-  },
   Download: {
     type: 'http',
     behavior: 'classical',
@@ -305,104 +293,25 @@ const ruleProviders = {
     format: 'yaml',
     path: './ruleset/Gemini.yaml',
     interval: 86400
-  },
-  Google: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Google/Google.yaml',
-    format: 'yaml',
-    path: './ruleset/Google.yaml',
-    interval: 86400
-  },
-  YouTube: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTube/YouTube.yaml',
-    format: 'yaml',
-    path: './ruleset/YouTube.yaml',
-    interval: 86400
-  },
-  YouTubeMusic: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/YouTubeMusic/YouTubeMusic.yaml',
-    format: 'yaml',
-    path: './ruleset/YouTubeMusic.yaml',
-    interval: 86400
-  },
-  Telegram: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/ericz15/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml',
-    format: 'yaml',
-    path: './ruleset/Telegram.yaml',
-    interval: 86400
-  },
-  GFW: {
-    type: 'http',
-    behavior: 'domain',
-    url: 'https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt',
-    path: './ruleset/GFW.yaml',
-    interval: 86400
-  },
-  China: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/ericz15/ios_rule_script/master/rule/Clash/ChinaMax/ChinaMax_Classical.yaml',
-    format: 'yaml',
-    interval: 86400,
-    path: './ruleset/China.yaml'
-  },
-  Lan: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Lan/Lan.yaml',
-    format: 'yaml',
-    path: './ruleset/Lan.yaml',
-    interval: 86400
   }
 }
 const ruleSets = [
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
   'RULE-SET,Gemini,💬 人工智能',
-  'RULE-SET,Download,⬇️ 低倍节点',
-  'RULE-SET,Game,🎮 游戏平台',
-  'RULE-SET,Apple,DIRECT',
-  'RULE-SET,OneDrive,⬇️ 低倍节点',
-  'RULE-SET,Microsoft,DIRECT',
-  'RULE-SET,Google,🚀 节点选择',
-  'RULE-SET,YouTube,🚀 节点选择',
-  'RULE-SET,YouTubeMusic,🚀 节点选择',
-  'RULE-SET,Telegram,🚀 节点选择',
-  'RULE-SET,GFW,🚀 节点选择',
-  'RULE-SET,China,DIRECT',
-  'RULE-SET,Lan,DIRECT,no-resolve'
-]
-const customRules = [
-  // ai
-  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
-  // github
-  'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
-  // debian
-  'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
-  // google
-  'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
-  // docker
-  'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
-  'DOMAIN-SUFFIX,dockerproxy.net,⬇️ 低倍节点',
-  // jetbrains
-  'DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT',
-  'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
-  'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn,DIRECT',
-  // claude
-  'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点'
+  'RULE-SET,Download,⬇️ 低倍节点'
 ]
 const rules = [
   ...customRules,
   ...ruleSets,
-  'GEOIP,CN,DIRECT,no-resolve',
+  'GEOSITE,category-games-!cn,🎮 游戏平台',
+  'GEOSITE,gfw,🚀 节点选择',
+  'GEOSITE,onedrive,DIRECT',
+  'GEOSITE,microsoft@cn,DIRECT',
+  'GEOSITE,apple-cn,DIRECT',
+  'GEOSITE,cn,DIRECT',
+  'GEOIP,private,DIRECT,no-resolve',
+  'GEOIP,CN,DIRECT',
   'MATCH,🐟 漏网之鱼'
 ]
 
