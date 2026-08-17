@@ -1,27 +1,30 @@
 /**
  * DNS
  */
-const defaultNameserver = ['119.29.29.29', '223.5.5.5']
+const defaultNameserver = [
+  'https://223.5.5.5/dns-query',
+  'https://1.12.12.12/dns-query'
+]
+
 // 国内DNS服务器
 const cnDNS = [
-  'https://dns.alidns.com/dns-query', // 阿里
-  'https://doh.pub/dns-query' // 腾讯
+  'https://223.5.5.5/dns-query', // 阿里
+  'https://1.12.12.12/dns-query' // 腾讯
 ]
 // 国外DNS服务器
 const foreignDNS = [
-  'https://8.8.8.8/dns-query', // Google
-  'https://1.1.1.1/dns-query', // Cloudflare
-  'https://9.9.9.9/dns-query' // Quad9
+  'https://dns.google/dns-query', // Google
+  'https://cloudflare-dns.com/dns-query' // Cloudflare
   // 'tls://8.8.8.8', // google
   // 'tls://1.1.1.1', // Cloudflare
-  // 'tls://9.9.9.9' // Quad9
 ]
 // DNS配置
+const dnsListen = '127.0.0.1:1053'
 const dnsConfig = {
   enable: true,
   // fake-ip缓存优化，提升性能
   'cache-algorithm': 'arc',
-  listen: '0.0.0.0:53',
+  listen: dnsListen,
   ipv6: false,
 
   'enhanced-mode': 'fake-ip',
@@ -29,6 +32,10 @@ const dnsConfig = {
 
   // fake ip 过滤：此列表中的主机名将不会使用 Fake IP 解析，即对这些域名的请求将始终使用其真实 IP 地址进行响应
   'fake-ip-filter': [
+    // 私有域名确保真实IP：内网域名需正确解析
+    'geosite:private',
+    // 国内域名确保真实IP：避免CDN路由异常，部分应用检查IP行为
+    'geosite:cn',
     '*.lan',
     '*.local',
     '*.localhost',
@@ -63,12 +70,7 @@ const dnsConfig = {
     '+.xbone.online',
     'xbox.*.microsoft.com',
     // 小米IoT：智能家居设备发现需要真实IP
-    '+.market.xiaomi.com',
-    'Mijia Cloud',
-    // 国内域名确保真实IP：避免CDN路由异常，部分应用检查IP行为
-    'geosite:cn',
-    // 私有域名确保真实IP：内网域名需正确解析
-    'geosite:private'
+    '+.market.xiaomi.com'
   ],
 
   // 是否回应配置中的 hosts
@@ -77,22 +79,25 @@ const dnsConfig = {
   'use-system-hosts': true,
 
   /**
-   * 默认域名服务器
-   * 用于解析 DNS 服务器 的域名，必须为 IP, 可为加密 DNS
-   */
-  'default-nameserver': defaultNameserver,
-  /**
-   * 代理节点域名解析服务器
-   * 仅用于解析代理节点的域名
-   */
-  // 'proxy-server-nameserver': cnDNS,
-  'proxy-server-nameserver': ['udp://127.0.0.1:53'],
-
-  /**
    * dns 连接遵守rules规则
    * 需配置 proxy-server-nameserver，强烈不建议和prefer-h3一起使用
    */
   'respect-rules': true,
+
+  /**
+   * 代理节点域名解析服务器
+   * 仅用于解析代理节点的域名
+   */
+  'proxy-server-nameserver': cnDNS,
+
+  /**
+   * 默认域名服务器
+   * 用于解析 DNS 服务器 的域名，必须为 IP, 可为加密 DNS
+   */
+  'default-nameserver': defaultNameserver,
+
+  // 用于 direct 出口域名解析的 DNS 服务器
+  'direct-nameserver': cnDNS,
 
   /**
    * 指定域名查询的解析服务器
@@ -100,16 +105,10 @@ const dnsConfig = {
    * 匹配失败，进入nameserver、fallback流程
    */
   'nameserver-policy': {
-    'geosite:private': 'system',
+    // 'geosite:private': 'system',
     'geosite:cn': cnDNS,
     'geosite:apple-cn': cnDNS
   },
-
-  // 用于 direct 出口域名解析的 DNS 服务器
-  'direct-nameserver': cnDNS,
-  // 是否遵循 nameserver-policy
-  'direct-nameserver-follow-policy': false,
-
   // 域名服务器
   nameserver: foreignDNS
 }
@@ -414,6 +413,15 @@ function main(clashConfig, profileName) {
   const { proxies } = clashConfig
   const proxyGroups = proxyGroupsGenerator(proxies)
 
+  if (/udp:\/\//.test(clashConfig?.dns?.['proxy-server-nameserver'])) {
+    const proxyServer = clashConfig.proxies[0]?.server
+      .split('.')
+      .slice(-2)
+      .join('.')
+    dnsConfig['fake-ip-filter'].push(`+.${proxyServer}`)
+    dnsConfig['proxy-server-nameserver'] = [`udp://${dnsListen}`]
+    dnsConfig.nameserver = cnDNS
+  }
   clashConfig['mixed-port'] = 7890
   clashConfig['dns'] = dnsConfig
   clashConfig['profile'] = {
