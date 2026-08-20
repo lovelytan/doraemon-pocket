@@ -299,8 +299,8 @@ const rules = [
   'GEOSITE,telegram,🚀 节点选择',
   'GEOIP,telegram,🚀 节点选择,no-resolve',
 
+  'GEOSITE,google,🚀 节点选择',
   'GEOSITE,microsoft@cn,DIRECT',
-  'GEOSITE,google@cn,DIRECT',
   'GEOSITE,apple-cn,DIRECT',
 
   'GEOSITE,private,DIRECT',
