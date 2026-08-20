@@ -242,8 +242,6 @@ const proxyGroupsGenerator = proxies => {
  * 规则
  */
 const customRules = [
-  // ai
-  'DOMAIN-SUFFIX,bard.google.com,💬 人工智能',
   // github
   'DOMAIN-SUFFIX,githubusercontent.com,⬇️ 低倍节点',
   // debian
@@ -262,14 +260,6 @@ const customRules = [
   'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点'
 ]
 const ruleProviders = {
-  Download: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/Clash/Download/Download.yaml',
-    format: 'yaml',
-    path: './ruleset/Download.yaml',
-    interval: 86400
-  },
   OpenAI: {
     type: 'http',
     behavior: 'classical',
@@ -293,33 +283,24 @@ const ruleProviders = {
     format: 'yaml',
     path: './ruleset/Gemini.yaml',
     interval: 86400
-  },
-  Telegram: {
-    type: 'http',
-    behavior: 'classical',
-    url: 'https://raw.githubusercontent.com/ericz15/ios_rule_script/master/rule/Clash/Telegram/Telegram.yaml',
-    format: 'yaml',
-    path: './ruleset/Telegram.yaml',
-    interval: 86400
   }
 }
 const ruleSets = [
   'RULE-SET,OpenAI,💬 人工智能',
   'RULE-SET,Claude,💬 人工智能',
-  'RULE-SET,Gemini,💬 人工智能',
-  'RULE-SET,Download,⬇️ 低倍节点',
-  'RULE-SET,Telegram,🚀 节点选择'
+  'RULE-SET,Gemini,💬 人工智能'
 ]
 const rules = [
   ...customRules,
   ...ruleSets,
+  'GEOSITE,category-ai-!cn,💬 人工智能',
   'GEOSITE,category-games-!cn,🎮 游戏平台',
 
   'GEOSITE,telegram,🚀 节点选择',
   'GEOIP,telegram,🚀 节点选择,no-resolve',
 
-  'GEOSITE,onedrive,DIRECT',
   'GEOSITE,microsoft@cn,DIRECT',
+  'GEOSITE,google@cn,DIRECT',
   'GEOSITE,apple-cn,DIRECT',
 
   'GEOSITE,private,DIRECT',
