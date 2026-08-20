@@ -247,7 +247,7 @@ const customRules = [
   // debian
   'DOMAIN-SUFFIX,deb.debian.org,⬇️ 低倍节点',
   // google
-  'DOMAIN-SUFFIX,dl.google.com,⬇️ 低倍节点',
+  'DOMAIN-SUFFIX,dl.google.com,DIRECT',
   'DOMAIN-SUFFIX,storage.googleapis.com,⬇️ 低倍节点',
   // docker
   'DOMAIN-SUFFIX,production.cloudflare.docker.com,⬇️ 低倍节点',
