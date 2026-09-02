@@ -257,7 +257,9 @@ const customRules = [
   'DOMAIN-SUFFIX,download-cdn.jetbrains.com.cn,DIRECT',
   'DOMAIN-SUFFIX,download-cdn.clf.jetbrains.com.cn,DIRECT',
   // claude
-  'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点'
+  'DOMAIN-SUFFIX,downloads.claude.ai,⬇️ 低倍节点',
+  // 下载
+  'DOMAIN-WILDCARD,dl.*,⬇️ 低倍节点'
 ]
 const ruleProviders = {
   OpenAI: {
