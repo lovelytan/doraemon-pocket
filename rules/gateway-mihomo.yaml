@@ -69,26 +69,16 @@ dns:
     - '+.163cdn-agent.com'
   use-hosts: true
   use-system-hosts: true
-  respect-rules: true
   proxy-server-nameserver:
     - udp://127.0.0.1:1053
   default-nameserver:
     - https://223.5.5.5/dns-query
     - https://1.12.12.12/dns-query
-  direct-nameserver:
-    - https://223.5.5.5/dns-query
-    - https://1.12.12.12/dns-query
-  nameserver-policy:
-    geosite:cn:
-      - https://223.5.5.5/dns-query
-      - https://1.12.12.12/dns-query
-    geosite:apple-cn:
-      - https://223.5.5.5/dns-query
-      - https://1.12.12.12/dns-query
   nameserver:
     - https://223.5.5.5/dns-query
     - https://1.12.12.12/dns-query
 
+geodata-mode: true
 geox-url:
   mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb
   geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat
@@ -113,19 +103,21 @@ proxy-groups:
     type: select
     use:
       - ytoo
-    proxies:
-      - 🗺 地区节点
-      - ⬇️ 低倍节点
-      - DIRECT
+    proxies: [🗺 地区节点, ⬇️ 低倍节点, DIRECT]
+
   - name: 🗺 地区节点
     type: select
     proxies:
-      - 🇭🇰 香港节点
-      - 🇨🇳 台湾节点
-      - 🇯🇵 日本节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇺🇲 美国节点
+      [
+        🇭🇰 香港节点,
+        🇨🇳 台湾节点,
+        🇯🇵 日本节点,
+        🇸🇬 新加坡节点,
+        🇰🇷 韩国节点,
+        🇺🇲 美国节点
+      ]
+
+  # 地区
   - name: 🇭🇰 香港节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -133,6 +125,7 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)香港|🇭🇰|hk|hongkong|hong kong'
+
   - name: 🇨🇳 台湾节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -140,6 +133,7 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)台湾|🇨🇳|Taiwan|TW'
+
   - name: 🇯🇵 日本节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -147,6 +141,7 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)日本|🇯🇵|Japan|JP|东京'
+
   - name: 🇸🇬 新加坡节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -154,6 +149,7 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)新加坡|🇸🇬|Singapore|SG|狮城'
+
   - name: 🇰🇷 韩国节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -161,6 +157,7 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)韩国|🇰🇷|Korea|Kr'
+
   - name: 🇺🇲 美国节点
     type: url-test
     url: https://www.gstatic.com/generate_204
@@ -168,11 +165,14 @@ proxy-groups:
     include-all: true
     exclude-type: direct
     filter: '(?i)美国|🇺🇸|American|US'
+
+  # 其他
   - name: ⬇️ 低倍节点
     type: select
     include-all: true
     exclude-type: direct
     filter: '(^|[^0-9])0\.[0-9]+|低'
+
   - name: 💬 人工智能
     type: select
     include-all: true
@@ -186,7 +186,6 @@ proxy-groups:
       - 🇺🇲 美国节点
 
 rules:
-  - GEOIP,lan,DIRECT,no-resolve
   - GEOSITE,private,DIRECT
   - GEOIP,private,DIRECT,no-resolve
 
@@ -202,4 +201,5 @@ rules:
 
   - GEOIP,CN,DIRECT,no-resolve
   - GEOSITE,cn,DIRECT
+
   - MATCH,🚀 节点选择
