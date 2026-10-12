@@ -78,7 +78,6 @@ dns:
     - https://223.5.5.5/dns-query
     - https://1.12.12.12/dns-query
 
-geodata-mode: true
 geox-url:
   mmdb: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country.mmdb
   geoip: https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip.dat
@@ -184,6 +183,12 @@ proxy-groups:
       - 🇸🇬 新加坡节点
       - 🇰🇷 韩国节点
       - 🇺🇲 美国节点
+      -
+  - name: 🐟 漏网之鱼
+    type: select
+    include-all: true
+    exclude-type: direct
+    proxies: [🚀 节点选择, DIRECT]
 
 rules:
   - GEOSITE,private,DIRECT
@@ -202,4 +207,4 @@ rules:
   - GEOIP,CN,DIRECT,no-resolve
   - GEOSITE,cn,DIRECT
 
-  - MATCH,🚀 节点选择
+  - MATCH,🐟 漏网之鱼
