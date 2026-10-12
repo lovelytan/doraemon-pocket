@@ -308,10 +308,11 @@ const rules = [
   'GEOSITE,private,DIRECT',
   'GEOIP,private,DIRECT,no-resolve',
 
+  'GEOSITE,gfw,🚀 节点选择',
+
   'GEOSITE,cn,DIRECT',
   'GEOIP,CN,DIRECT,no-resolve',
 
-  'GEOSITE,gfw,🚀 节点选择',
   'MATCH,🐟 漏网之鱼'
 ]
 
