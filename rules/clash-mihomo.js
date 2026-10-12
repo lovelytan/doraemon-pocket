@@ -293,8 +293,12 @@ const ruleSets = [
   'RULE-SET,Gemini,💬 人工智能'
 ]
 const rules = [
+  'GEOSITE,private,DIRECT',
+  'GEOIP,private,DIRECT,no-resolve',
+
   ...customRules,
   ...ruleSets,
+
   'GEOSITE,category-ai-!cn,💬 人工智能',
   'GEOSITE,category-games-!cn,🎮 游戏平台',
 
@@ -304,9 +308,6 @@ const rules = [
   'GEOSITE,google,🚀 节点选择',
   'GEOSITE,microsoft@cn,DIRECT',
   'GEOSITE,apple-cn,DIRECT',
-
-  'GEOSITE,private,DIRECT',
-  'GEOIP,private,DIRECT,no-resolve',
 
   'GEOSITE,gfw,🚀 节点选择',
 
