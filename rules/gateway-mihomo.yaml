@@ -186,7 +186,7 @@ proxy-groups:
       - 🇸🇬 新加坡节点
       - 🇰🇷 韩国节点
       - 🇺🇲 美国节点
-      -
+
   - name: 🐟 漏网之鱼
     type: select
     include-all: true

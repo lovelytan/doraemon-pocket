@@ -197,16 +197,19 @@ const proxyGroupsGenerator = proxies => {
     {
       name: '⬇️ 低倍节点',
       type: 'select',
-      proxies: ['DIRECT', ...(customProxyGroup['⬇️ 低倍节点']?.proxies || [])]
+      proxies: [
+        'DIRECT',
+        '🗺 地区节点',
+        ...(customProxyGroup['⬇️ 低倍节点']?.proxies || [])
+      ]
     },
     {
       name: '💬 人工智能',
       type: 'select',
       proxies: [
-        ...(customProxyGroup['💬 人工智能']?.proxies || []),
-        ...areaProxyGroupName,
-        ...proxies.map(item => item.name),
-        'DIRECT'
+        'DIRECT',
+        '🗺 地区节点',
+        ...(customProxyGroup['⬇️ 低倍节点']?.proxies || [])
       ]
     },
     {
