@@ -211,7 +211,11 @@ const proxyGroupsGenerator = proxies => {
     {
       name: '⌨️ 氛围编程',
       type: 'select',
-      proxies: ['DIRECT', ...areaProxyGroupName]
+      proxies: [
+        'DIRECT',
+        ...(customProxyGroup['⬇️ 低倍节点']?.proxies || []),
+        ...areaProxyGroupName
+      ]
     },
     {
       name: '🎮 游戏平台',
