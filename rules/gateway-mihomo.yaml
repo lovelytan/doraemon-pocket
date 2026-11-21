@@ -91,9 +91,19 @@ geo-update-interval: 72
 proxy-providers:
   ytoo:
     type: http
-    url: 'https://58ffd55a743e.ai-163cdn.com/sub?target=clash&filename=YToo&new_name=true&scv=true&tfo=false&clash.doh=true&emoji=true&udp=true&url=https%3A%2F%2Fapi.ytoo.xyz%2Fosubscribe.php%3Fsid%3D79484%26token%3DfYTyxzVnhvk7'
+    url: ''
     path: ./proxy-providers/ytoo.yaml
     interval: 0
+    health-check:
+      enable: true
+      url: https://www.gstatic.com/generate_204
+      interval: 600
+
+  1yuan:
+    type: http
+    url: ''
+    path: ./proxy-providers/1yuan.yaml
+    interval: 3600
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -104,8 +114,13 @@ proxy-groups:
   - name: 🚀 节点选择
     type: select
     use:
-      - ytoo
-    proxies: [🗺 地区节点, ⬇️ 低倍节点, DIRECT]
+      - 1yuan
+    proxies:
+      - 🗺 地区节点
+      - ⬇️ 低倍节点
+      - 🥇 1yuan
+      - 🐰 ytoo
+      - DIRECT
 
   - name: 🗺 地区节点
     type: select
@@ -124,7 +139,9 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    # include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)香港|🇭🇰|hk|hongkong|hong kong'
 
@@ -132,7 +149,8 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)台湾|🇨🇳|Taiwan|TW'
 
@@ -140,7 +158,8 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)日本|🇯🇵|Japan|JP|东京'
 
@@ -148,7 +167,8 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)新加坡|🇸🇬|Singapore|SG|狮城'
 
@@ -156,7 +176,8 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)韩国|🇰🇷|Korea|Kr'
 
@@ -164,33 +185,47 @@ proxy-groups:
     type: url-test
     url: https://www.gstatic.com/generate_204
     interval: 300
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(?i)美国|🇺🇸|American|US'
 
   # 其他
   - name: ⬇️ 低倍节点
     type: select
-    include-all: true
+    use:
+      - 1yuan
     exclude-type: direct
     filter: '(^|[^0-9])0\.[0-9]+|低'
 
   - name: 💬 人工智能
     type: select
-    include-all: true
+    use:
+      - ytoo
     exclude-type: direct
+    filter: '(?i)美国|🇺🇸|American|US'
     proxies:
-      - 🇭🇰 香港节点
-      - 🇨🇳 台湾节点
-      - 🇯🇵 日本节点
-      - 🇸🇬 新加坡节点
-      - 🇰🇷 韩国节点
-      - 🇺🇲 美国节点
+      - DIRECT
+
+  - name: 🥇 1yuan
+    type: url-test
+    use:
+      - 1yuan
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: false
+
+  - name: 🐰 ytoo
+    type: select
+    use:
+      - ytoo
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
 
   - name: 🐟 漏网之鱼
     type: select
-    include-all: true
-    exclude-type: direct
     proxies: [🚀 节点选择, DIRECT]
 
 rules:
