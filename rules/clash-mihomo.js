@@ -70,7 +70,9 @@ const dnsConfig = {
     '+.xbone.online',
     'xbox.*.microsoft.com',
     // 小米IoT：智能家居设备发现需要真实IP
-    '+.market.xiaomi.com'
+    '+.market.xiaomi.com',
+    // 走本机 DNS 的节点域名：不能被 fake-ip 污染，否则自环会拿到 198.18.x.x
+    '+.163cdn-agent.com'
   ],
 
   // 是否回应配置中的 hosts
@@ -89,6 +91,14 @@ const dnsConfig = {
    * 仅用于解析代理节点的域名
    */
   'proxy-server-nameserver': cnDNS,
+
+  /**
+   * 例外：这些节点域名绕回本机 DNS，才能命中 hosts 重写
+   * 前提：该后缀已在 fake-ip-filter 中，且 proxy-server-nameserver 非空
+   */
+  'proxy-server-nameserver-policy': {
+    '+.163cdn-agent.com': `udp://${dnsListen}`
+  },
 
   /**
    * 默认域名服务器
@@ -110,7 +120,7 @@ const dnsConfig = {
     'geosite:apple-cn': cnDNS
   },
   // 域名服务器
-  nameserver: foreignDNS
+  nameserver: cnDNS
 }
 
 /**
@@ -321,16 +331,6 @@ const rules = [
 function main(clashConfig, profileName) {
   const { proxies } = clashConfig
   const proxyGroups = proxyGroupsGenerator(proxies)
-
-  if (/udp:\/\//.test(clashConfig?.dns?.['proxy-server-nameserver'])) {
-    const proxyServer = clashConfig.proxies[0]?.server
-      .split('.')
-      .slice(-2)
-      .join('.')
-    dnsConfig['fake-ip-filter'].push(`+.${proxyServer}`)
-    dnsConfig['proxy-server-nameserver'] = [`udp://${dnsListen}`]
-    dnsConfig.nameserver = cnDNS
-  }
 
   clashConfig['geo-auto-update'] = true
   clashConfig['geo-update-interval'] = 24
